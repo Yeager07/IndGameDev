@@ -199,6 +199,54 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Dice",
+            "id": "dbdc8b6e-5c49-4f3f-a41a-35f3fd9a96eb",
+            "actions": [
+                {
+                    "name": "Drop",
+                    "type": "Button",
+                    "id": "6574bfd7-8dac-40d8-a54c-7850839d133d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Rotate",
+                    "type": "Button",
+                    "id": "60afcc05-ad9b-471b-9bcd-051df214c4be",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "dc4cf215-a4f1-4e1a-9f8a-b067065692f6",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse;Mouse&Keyboard",
+                    "action": "Drop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "63a6b888-55d8-4c5a-a08c-4777c95073be",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse;Mouse&Keyboard",
+                    "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
