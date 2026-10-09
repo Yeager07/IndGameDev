@@ -9,22 +9,18 @@ public class Dice : MonoBehaviour
     [SerializeField] private DiceInputs diceInputs;
     [SerializeField] private int dropForce;
     [SerializeField] private int torqueForce;
-    [SerializeField] private Transform normalsChecker;
     [SerializeField] private Vector3[] direction = new Vector3[7];
-
 
     private Rigidbody rb;
     private Dictionary<string, int> score = new Dictionary<string, int>()
     {
-        { "Left", 1 },
-        { "Down", 5 },
-        { "Right", 6 },
-        { "Back",  4 },
-        { "Up", 2 },
-        { "Front", 3 }
+        { "Left", 6 },
+        { "Down", 2 },
+        { "Right", 1 },
+        { "Back",  3 },
+        { "Up", 5 },
+        { "Front", 4 }
     };
-    private bool isCollinear;
-    private string previousCollinearVector = "Up";
     public int currentScore = 0;
 
     private void Awake()
@@ -36,19 +32,6 @@ public class Dice : MonoBehaviour
         
         diceInputs.dropEvent.AddListener(OnDrop);
         diceInputs.rotateEvent.AddListener(OnRotate);
-    }
-
-    /*private void Update()
-    {
-        OnDrop();
-    }*/
-
-    private void FixedUpdate()
-    {
-        if(CheckNormal() == previousCollinearVector)
-        currentScore = score[previousCollinearVector];
-        else
-        previousCollinearVector = CheckNormal();
     }
 
     private void OnDrop()
@@ -65,20 +48,9 @@ public class Dice : MonoBehaviour
         torqueForce = UnityEngine.Random.Range(-20, 20);
     }
 
-    private string CheckNormal()
+    public void CheckNormal(Transform side)
     {
-        float dotProduct;
-        string collinearVector = "Up";
-
-        for(int i = transform.childCount - 1; i >= 0; i--)
-        {
-            Transform child = transform.GetChild(i);
-            dotProduct = Vector3.Dot(child.up, normalsChecker.up);
-            
-            if(dotProduct > 0.9)
-            collinearVector = child.name;
-        }
-
-        return collinearVector;
+        currentScore = score[side.name];
+        transform.parent.gameObject.GetComponent<CountScore>().CountAllScore();
     }
 }
