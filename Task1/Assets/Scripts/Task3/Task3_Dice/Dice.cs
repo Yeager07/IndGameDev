@@ -6,12 +6,12 @@ using UnityEngine.InputSystem;
 
 public class Dice : MonoBehaviour
 {
-    [SerializeField] private DiceInputs diceInputs;
     [SerializeField] private int dropForce;
     [SerializeField] private int torqueForce;
     [SerializeField] private Vector3[] direction = new Vector3[7];
-
-    private Rigidbody rb;
+    
+    [SerializeField] private Rigidbody rb;
+    
     private Dictionary<string, int> score = new Dictionary<string, int>()
     {
         { "Left", 6 },
@@ -21,6 +21,10 @@ public class Dice : MonoBehaviour
         { "Up", 5 },
         { "Front", 4 }
     };
+
+    private DiceInputs diceInputs;
+    private GameManager gameManager;
+
     public int currentScore = 0;
 
     private void Awake()
@@ -29,7 +33,13 @@ public class Dice : MonoBehaviour
 
         dropForce = UnityEngine.Random.Range(3, 8);
         torqueForce = UnityEngine.Random.Range(-20, 20);
-        
+    }
+
+    private void Start()
+    {
+        gameManager = transform.parent.GetComponent<GameManager>();
+        diceInputs = gameManager.diceInputs;
+
         diceInputs.dropEvent.AddListener(OnDrop);
         diceInputs.rotateEvent.AddListener(OnRotate);
     }
@@ -39,7 +49,6 @@ public class Dice : MonoBehaviour
         rb.AddForce(Vector3.up * dropForce, ForceMode.Impulse);
         rb.AddForce(direction[UnityEngine.Random.Range(0, 2)] * dropForce, ForceMode.Impulse);
         dropForce = UnityEngine.Random.Range(3, 5);
-        return;
     }
 
     private void OnRotate()
@@ -51,6 +60,6 @@ public class Dice : MonoBehaviour
     public void CheckNormal(Transform side)
     {
         currentScore = score[side.name];
-        transform.parent.gameObject.GetComponent<CountScore>().CountAllScore();
+        gameManager.CountAllScore();
     }
 }
