@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public event Action<int> OnTotalScoreChanged;
     public event Action<int> OnCurrentScoreChanged;
     public event Action<int, int, int> OnTargetsChanged;
+    public event Action<int> OnThrowCountChanged;
     public event Action<GameResult> OnGameEnded;
 
     [SerializeField] private GameObject cubePrefab;
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
     private int loseScore;
     private int drawScore;
     private int cubesCount = 3;
+    private int throwCount = 0;
     private bool isRolling;
     private bool isGameOver;
     private readonly HashSet<Dice> rollingDice = new();
@@ -73,6 +75,7 @@ public class GameManager : MonoBehaviour
 
         totalScore = 0;
         currentScore = 0;
+        throwCount = 0;
 
         InitializeCubes(cubesCount);
         GenerateTarget();
@@ -84,14 +87,16 @@ public class GameManager : MonoBehaviour
 
     public void GenerateTarget()
     {
-        winScore = UnityEngine.Random.Range(20, 50);
-        loseScore = UnityEngine.Random.Range(3, 6);
-        drawScore = UnityEngine.Random.Range(15, 30);
+        winScore = UnityEngine.Random.Range(cubesCount*cubesCount*3, cubesCount*cubesCount*5);
+        loseScore = UnityEngine.Random.Range(1, cubesCount*cubesCount*3/2);
+        drawScore = UnityEngine.Random.Range(cubesCount*cubesCount*3/2, cubesCount*cubesCount*4);
     }
 
     public void RollDice()
     {
-        if(isRolling || isGameOver) return;
+        if(isRolling || isGameOver)
+        return;
+        
         isRolling = true;
         rollingDice.Clear();
 
@@ -101,6 +106,9 @@ public class GameManager : MonoBehaviour
             rollingDice.Add(die);
             die.StartRoll();
         }
+
+        throwCount += 1;
+        OnThrowCountChanged?.Invoke(throwCount);
     }
 
     private void HendleDieStopped(Dice dice)
@@ -119,10 +127,14 @@ public class GameManager : MonoBehaviour
 
         totalScore += currentScore;
 
+        if(throwCount == cubesCount)
+        {
+            isGameOver = true;
+            CheckGameEnd();
+        }
+
         OnCurrentScoreChanged?.Invoke(currentScore);
         OnTotalScoreChanged?.Invoke(totalScore);
-
-        CheckGameEnd();
     }
 
     private void CheckGameEnd()
@@ -135,12 +147,11 @@ public class GameManager : MonoBehaviour
         else if(totalScore <= loseScore)
         result = GameResult.Lose;
         
-        else if(totalScore == drawScore) 
+        else if(totalScore <= winScore && totalScore > loseScore) 
         result = GameResult.Draw;
         
         else return;
 
-        isGameOver = true;
         OnGameEnded?.Invoke(result);
     }
 

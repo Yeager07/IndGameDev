@@ -13,6 +13,10 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameManager gameManager;
 
+    [SerializeField] private TextMeshProUGUI throwCountText;
+    [SerializeField] private GameObject resultPanel;
+    [SerializeField] private GameObject scorePanel;
+    [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private TextMeshProUGUI currentScoreText;
     [SerializeField] private TextMeshProUGUI totalScoreText;
     [SerializeField] private TextMeshProUGUI scoreToWinText;
@@ -23,6 +27,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_InputField inputScoreToLose;
     [SerializeField] private TMP_InputField inputScoreToDraw;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button restartResultButton;
+
+    private void Start()
+    {
+        resultPanel.SetActive(false);
+        scorePanel.SetActive(true);
+    }
 
     private void OnEnable()
     {
@@ -32,10 +43,12 @@ public class UIManager : MonoBehaviour
 
         gameManager.OnTotalScoreChanged += UpdateTotalScore;
         gameManager.OnCurrentScoreChanged += UpdateCurrentScore;
+        gameManager.OnThrowCountChanged += UpdateThrowCount;
         gameManager.OnTargetsChanged += UpdateTargets;
         gameManager.OnGameEnded += ShowResults;
 
         restartButton.onClick.AddListener(gameManager.RestartGame);
+        restartResultButton.onClick.AddListener(OnRestartGameClicked);
 
         inputCubesCount.onEndEdit.AddListener(OnDiceCount);
         inputScoreToWin.onEndEdit.AddListener(winHandler);
@@ -47,6 +60,7 @@ public class UIManager : MonoBehaviour
     {
         gameManager.OnTotalScoreChanged -= UpdateTotalScore;
         gameManager.OnCurrentScoreChanged -= UpdateCurrentScore;
+        gameManager.OnThrowCountChanged -= UpdateThrowCount;
         gameManager.OnTargetsChanged -= UpdateTargets;
         gameManager.OnGameEnded -= ShowResults;
 
@@ -63,6 +77,11 @@ public class UIManager : MonoBehaviour
         totalScoreText.text = "Total Score: " + totalScore.ToString();
     }
 
+    private void UpdateThrowCount(int throwCount)
+    {
+        throwCountText.text = "Throw Count: " + throwCount.ToString();
+    }
+
     private void UpdateCurrentScore(int currentScore)
     {
         currentScoreText.text = "Current Score: " + currentScore.ToString();
@@ -77,7 +96,15 @@ public class UIManager : MonoBehaviour
 
     private void ShowResults(GameResult result)
     {
-
+        resultPanel.SetActive(true);
+        scorePanel.SetActive(false);
+        resultText.text = result switch
+        {
+            GameResult.Win  => "Win!",
+            GameResult.Lose => "Lose!",
+            GameResult.Draw => "Draw!",
+            _ => ""
+        };
     }
 
     private void OnDiceCount(string text)
@@ -90,5 +117,12 @@ public class UIManager : MonoBehaviour
     {
         if(int.TryParse(text, out int value))
         setter(value);
+    }
+
+    private void OnRestartGameClicked()
+    {
+        resultPanel.SetActive(false);
+        scorePanel.SetActive(true);
+        gameManager.RestartGame();
     }
 }
